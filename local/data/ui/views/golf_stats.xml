@@ -1,0 +1,470 @@
+<form script="custom_layout_width.js" theme="dark">
+  <label>Overall Stats</label>
+  <fieldset submitButton="false">
+    <input type="time" token="field1">
+      <label></label>
+      <default>
+        <earliest>0</earliest>
+        <latest></latest>
+      </default>
+    </input>
+  </fieldset>
+  <row>
+    <panel>
+      <title>Best Average</title>
+      <single>
+        <search>
+          <query>index=golf NOT Heartbeat
+| reverse
+| filldown name
+| sort name
+| transaction name
+| stats avg(total_distance_yds) as avgDist by name
+| sort - avgDist
+| fields name</query>
+          <earliest>$field1.earliest$</earliest>
+          <latest>$field1.latest$</latest>
+          <sampleRatio>1</sampleRatio>
+          <refresh>30s</refresh>
+          <refreshType>delay</refreshType>
+        </search>
+        <option name="height">75</option>
+        <option name="refresh.display">progressbar</option>
+      </single>
+    </panel>
+    <panel>
+      <title>Longest Drive</title>
+      <single>
+        <search>
+          <query>index=golf 
+| eval shot=if(isnull(shot),"switch",shot) 
+| transaction startswith="shot=switch" 
+| stats max(total_distance_yds) as total by name 
+| sort - total 
+| head 1 
+| eval total=round(total,2)</query>
+          <earliest>$field1.earliest$</earliest>
+          <latest>$field1.latest$</latest>
+          <sampleRatio>1</sampleRatio>
+          <refresh>30s</refresh>
+          <refreshType>delay</refreshType>
+        </search>
+        <option name="height">75</option>
+      </single>
+    </panel>
+    <panel>
+      <title>Fastest Club Head Speed</title>
+      <single>
+        <search>
+          <query>index=golf 
+| eval shot=if(isnull(shot),"switch",shot) 
+| transaction startswith="shot=switch" 
+| stats max(club_head_speed_mph) as total by name
+| search total &lt; 200 AND total &gt; 0 
+| sort - total 
+| head 1 
+| eval total=round(total,2)</query>
+          <earliest>$field1.earliest$</earliest>
+          <latest>$field1.latest$</latest>
+          <sampleRatio>1</sampleRatio>
+          <refresh>30s</refresh>
+          <refreshType>delay</refreshType>
+        </search>
+        <option name="height">75</option>
+        <option name="refresh.display">progressbar</option>
+      </single>
+    </panel>
+    <panel>
+      <title>Straightest Shooter</title>
+      <single>
+        <search>
+          <query>index=golf NOT Heartbeat
+| eval offline=abs(offline)
+| reverse
+| filldown name
+| sort name
+| transaction name
+| stats avg(offline) as total by name 
+| eval total=abs(total)
+| sort + total 
+| head 1 
+| eval total=round(total,2)
+| eval display=total
+| fields name</query>
+          <earliest>$field1.earliest$</earliest>
+          <latest>$field1.latest$</latest>
+          <sampleRatio>1</sampleRatio>
+          <refresh>30s</refresh>
+          <refreshType>delay</refreshType>
+        </search>
+        <option name="height">75</option>
+        <option name="refresh.display">progressbar</option>
+      </single>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <single>
+        <search>
+          <query>index=golf NOT Heartbeat
+| reverse
+| filldown name
+| sort name
+| transaction name
+| stats avg(total_distance_yds) as avgDist by name
+| sort - avgDist
+| fields avgDist</query>
+          <earliest>$field1.earliest$</earliest>
+          <latest>$field1.latest$</latest>
+          <sampleRatio>1</sampleRatio>
+          <refresh>35s</refresh>
+          <refreshType>delay</refreshType>
+        </search>
+        <option name="height">60</option>
+        <option name="rangeColors">["0x53a051","0x0877a6","0xf8be34","0xf1813f","0xdc4e41"]</option>
+        <option name="refresh.display">progressbar</option>
+        <option name="unit">yds</option>
+        <option name="useColors">1</option>
+      </single>
+    </panel>
+    <panel>
+      <single>
+        <search>
+          <query>index=golf 
+| eval shot=if(isnull(shot),"switch",shot) 
+| transaction startswith="shot=switch" 
+| stats max(total_distance_yds) as total by name 
+| sort - total 
+| head 1 
+| eval total=round(total,2)
+| eval display=total
+| fields display</query>
+          <earliest>$field1.earliest$</earliest>
+          <latest>$field1.latest$</latest>
+          <sampleRatio>1</sampleRatio>
+          <refresh>35s</refresh>
+          <refreshType>delay</refreshType>
+        </search>
+        <option name="height">60</option>
+        <option name="numberPrecision">0.0</option>
+        <option name="rangeColors">["0xd93f3c","0xf58f39","0xf7bc38","0x6db7c6","0x65a637"]</option>
+        <option name="rangeValues">[100,150,200,250]</option>
+        <option name="unit">yds</option>
+        <option name="useColors">1</option>
+      </single>
+    </panel>
+    <panel>
+      <single>
+        <search>
+          <query>index=golf
+| eval shot=if(isnull(shot),"switch",shot) 
+| transaction startswith="shot=switch" 
+| stats max(club_head_speed_mph) as total by name
+| search total &lt; 200 AND total &gt; 0
+| sort - total 
+| head 1 
+| eval total=round(total,2)
+| eval display=total
+| fields display</query>
+          <earliest>$field1.earliest$</earliest>
+          <latest>$field1.latest$</latest>
+          <sampleRatio>1</sampleRatio>
+          <refresh>35s</refresh>
+          <refreshType>delay</refreshType>
+        </search>
+        <option name="height">60</option>
+        <option name="numberPrecision">0.0</option>
+        <option name="rangeColors">["0xd93f3c","0xf58f39","0xf7bc38","0x6db7c6","0x65a637"]</option>
+        <option name="rangeValues">[80,100,125,135]</option>
+        <option name="refresh.display">progressbar</option>
+        <option name="unit">mph</option>
+        <option name="useColors">1</option>
+      </single>
+    </panel>
+    <panel>
+      <single>
+        <search>
+          <query>index=golf NOT Heartbeat
+| eval offline=abs(offline)
+| reverse
+| filldown name
+| sort name
+| transaction name
+| stats avg(offline) as total by name 
+| eval total=abs(total)
+| sort + total 
+| head 1 
+| eval total=round(total,2)
+| eval display=total
+| fields total</query>
+          <earliest>$field1.earliest$</earliest>
+          <latest>$field1.latest$</latest>
+          <sampleRatio>1</sampleRatio>
+          <refresh>35s</refresh>
+          <refreshType>delay</refreshType>
+        </search>
+        <option name="height">60</option>
+        <option name="numberPrecision">0.000</option>
+        <option name="rangeColors">["0x53a051","0x0877a6","0xf8be34","0xf1813f","0xdc4e41"]</option>
+        <option name="refresh.display">progressbar</option>
+        <option name="unit">yds</option>
+        <option name="useColors">1</option>
+      </single>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <single>
+        <title>Golfers</title>
+        <search>
+          <query>index=golf | stats dc(name)</query>
+          <earliest>$field1.earliest$</earliest>
+          <latest>$field1.latest$</latest>
+        </search>
+        <option name="drilldown">none</option>
+        <option name="refresh.display">progressbar</option>
+      </single>
+    </panel>
+    <panel>
+      <single>
+        <title>Total Shots Taken</title>
+        <search>
+          <query>index=golf club="1w" | stats count</query>
+          <earliest>$field1.earliest$</earliest>
+          <latest>$field1.latest$</latest>
+        </search>
+        <option name="drilldown">none</option>
+        <option name="refresh.display">progressbar</option>
+      </single>
+    </panel>
+    <panel>
+      <single>
+        <title>Total Distance</title>
+        <search>
+          <query>index=golf club="1w" | stats sum(total_distance_yds)</query>
+          <earliest>$field1.earliest$</earliest>
+          <latest>$field1.latest$</latest>
+        </search>
+        <option name="drilldown">none</option>
+        <option name="refresh.display">progressbar</option>
+      </single>
+    </panel>
+  </row>
+  <row id="golf">
+    <panel>
+      <title>Top 25 - Click Player Name to see detailed statistics</title>
+      <table>
+        <search>
+          <query>index=golf NOT Heartbeat
+| reverse
+| filldown name
+| sort name
+| transaction name
+| stats dc(shot) as Shots  avg(total_distance_yds) as avgDist max(total_distance_yds) as maxDist  avg(club_head_speed_mph) as avgCHSpeed max(club_head_speed_mph) as maxCHSpeed 
+avg(carry_yds) as avgCarry max(carry_yds) as maxCarry avg(offline) as avgCenter by name | eval avgCenter=round(abs(avgCenter),2)
+| eval avgDist=round(avgDist,2), avgCHSpeed=round(avgCHSpeed,2), avgCarry=round(avgCarry,2), maxCarry=round(maxCarry,2), maxCHSpeed=round(maxCHSpeed,2), maxDist=round(maxDist,2)
+| search maxCHSpeed &lt; 200
+| sort - maxDist
+| rename maxCHSpeed AS "Max CH Speed" avgCenter AS "Avg Center" avgDist AS "Avg Dist" name AS Name avgCHSpeed AS "Avg CH Speed" avgCarry AS "Avg Carry" maxCarry AS "Max Carry" maxDist AS "Max Dist"</query>
+          <earliest>$field1.earliest$</earliest>
+          <latest>$field1.latest$</latest>
+          <sampleRatio>1</sampleRatio>
+          <refresh>30s</refresh>
+          <refreshType>delay</refreshType>
+        </search>
+        <option name="count">25</option>
+        <option name="dataOverlayMode">none</option>
+        <option name="drilldown">cell</option>
+        <option name="percentagesRow">false</option>
+        <option name="refresh.display">progressbar</option>
+        <option name="rowNumbers">true</option>
+        <option name="totalsRow">false</option>
+        <option name="wrap">true</option>
+        <format type="color" field="maxDist">
+          <colorPalette type="minMidMax" maxColor="#31A35F" minColor="#FFFFFF"></colorPalette>
+          <scale type="minMidMax"></scale>
+        </format>
+        <format type="color" field="avgDist">
+          <colorPalette type="minMidMax" maxColor="#31A35F" minColor="#FFFFFF"></colorPalette>
+          <scale type="minMidMax"></scale>
+        </format>
+        <format type="color" field="avgCHSpeed">
+          <colorPalette type="minMidMax" maxColor="#1E93C6" minColor="#FFFFFF"></colorPalette>
+          <scale type="minMidMax"></scale>
+        </format>
+        <format type="color" field="maxCHSpeed">
+          <colorPalette type="minMidMax" maxColor="#1E93C6" minColor="#FFFFFF"></colorPalette>
+          <scale type="minMidMax"></scale>
+        </format>
+        <format type="color" field="numShots">
+          <colorPalette type="minMidMax" maxColor="#D6563C" minColor="#FFFFFF"></colorPalette>
+          <scale type="minMidMax"></scale>
+        </format>
+        <format type="color" field="avgCarry">
+          <colorPalette type="minMidMax" maxColor="#31A35F" minColor="#FFFFFF"></colorPalette>
+          <scale type="minMidMax"></scale>
+        </format>
+        <format type="color" field="maxCarry">
+          <colorPalette type="minMidMax" maxColor="#31A35F" minColor="#FFFFFF"></colorPalette>
+          <scale type="minMidMax"></scale>
+        </format>
+        <format type="number" field="maxDist">
+          <option name="precision">1</option>
+          <option name="unit">yards</option>
+        </format>
+        <format type="number" field="avgDist">
+          <option name="precision">0</option>
+          <option name="unit">yards</option>
+        </format>
+        <format type="number" field="avgCHSpeed">
+          <option name="unit">mph</option>
+        </format>
+        <format type="number" field="maxCHSpeed">
+          <option name="unit">mph</option>
+        </format>
+        <format type="number" field="avgCarry"></format>
+        <format type="number" field="maxCarry"></format>
+        <format type="color" field="avgCenter">
+          <colorPalette type="minMidMax" maxColor="#FFFFFF" minColor="#6A5C9E"></colorPalette>
+          <scale type="minMidMax"></scale>
+        </format>
+        <drilldown>
+          <set token="name">$row.name$</set>
+          <set token="form.name">$row.name$</set>
+          <set token="show">true</set>
+        </drilldown>
+      </table>
+    </panel>
+    <panel>
+      <input type="dropdown" token="name">
+        <label>Select a Player:</label>
+        <choice value="*">All</choice>
+        <search>
+          <query>index=golf | stats count by name</query>
+        </search>
+        <default>*</default>
+        <fieldForLabel>name</fieldForLabel>
+        <fieldForValue>name</fieldForValue>
+      </input>
+      <chart>
+        <search>
+          <query>index=golf
+| reverse | filldown name 
+| stats max(offline) max(total_distance_yds) as total max(club_head_speed_mph) by name shot | search name="$name$" | fields - shot</query>
+          <earliest>$field1.earliest$</earliest>
+          <latest>$field1.latest$</latest>
+          <sampleRatio>1</sampleRatio>
+          <refresh>17s</refresh>
+          <refreshType>delay</refreshType>
+        </search>
+        <option name="charting.axisLabelsX.majorLabelStyle.overflowMode">ellipsisNone</option>
+        <option name="charting.axisLabelsX.majorLabelStyle.rotation">0</option>
+        <option name="charting.axisTitleX.visibility">collapsed</option>
+        <option name="charting.axisTitleY.text">yards</option>
+        <option name="charting.axisTitleY.visibility">visible</option>
+        <option name="charting.axisTitleY2.visibility">visible</option>
+        <option name="charting.axisX.scale">linear</option>
+        <option name="charting.axisY.maximumNumber">350</option>
+        <option name="charting.axisY.minimumNumber">0</option>
+        <option name="charting.axisY.scale">linear</option>
+        <option name="charting.axisY2.enabled">0</option>
+        <option name="charting.axisY2.scale">inherit</option>
+        <option name="charting.backgroundColor">#009933</option>
+        <option name="charting.chart">bubble</option>
+        <option name="charting.chart.bubbleMaximumSize">40</option>
+        <option name="charting.chart.bubbleMinimumSize">10</option>
+        <option name="charting.chart.bubbleSizeBy">area</option>
+        <option name="charting.chart.nullValueMode">gaps</option>
+        <option name="charting.chart.showDataLabels">none</option>
+        <option name="charting.chart.sliceCollapsingThreshold">0.01</option>
+        <option name="charting.chart.stackMode">default</option>
+        <option name="charting.chart.style">shiny</option>
+        <option name="charting.drilldown">all</option>
+        <option name="charting.fontColor">#FFFFFF</option>
+        <option name="charting.layout.splitSeries">0</option>
+        <option name="charting.layout.splitSeries.allowIndependentYRanges">0</option>
+        <option name="charting.legend.labelStyle.overflowMode">ellipsisMiddle</option>
+        <option name="charting.legend.placement">bottom</option>
+        <option name="charting.seriesColors">[0xFFFFFF]</option>
+        <option name="height">650</option>
+      </chart>
+    </panel>
+  </row>
+  <row>
+    <panel depends="$show$">
+      <title>Individual Stats for $name$</title>
+      <input type="dropdown" token="attribute">
+        <label>Select an Attribute</label>
+        <choice value="total_distance_yds">Total Distance</choice>
+        <choice value="club_head_speed_mph">Club Head Speed</choice>
+        <choice value="carry_yds">Carry</choice>
+        <choice value="offline">On Center</choice>
+        <default>total_distance_yds</default>
+        <initialValue>total_distance_yds</initialValue>
+        <fieldForLabel>attribute</fieldForLabel>
+        <fieldForValue>attribute</fieldForValue>
+      </input>
+      <input type="dropdown" token="attribute_overlay">
+        <label>Select an Overlay</label>
+        <choice value="total_distance_yds">Total Distance</choice>
+        <choice value="club_head_speed_mph">Club Head Speed</choice>
+        <choice value="carry_yds">Carry</choice>
+        <choice value="offline">On Center</choice>
+        <default>club_head_speed_mph</default>
+        <initialValue>club_head_speed_mph</initialValue>
+        <fieldForLabel>attribute_overlay</fieldForLabel>
+        <fieldForValue>attribute_overlay</fieldForValue>
+      </input>
+      <input type="link" token="hide">
+        <label></label>
+        <choice value="hide">Hide Me</choice>
+        <change>
+          <condition value="hide">
+            <set token="hide">true</set>
+            <unset token="show"></unset>
+          </condition>
+        </change>
+      </input>
+      <chart>
+        <search>
+          <query>index=golf 
+| reverse 
+| filldown name 
+| stats values($attribute$) as value values($attribute_overlay$) as value_overlay by name shot 
+| search name="$name$" 
+| rename shot AS shot_sort 
+| sort + shot_sort 
+| fields - shot_sort 
+| streamstats count as "Shot #" 
+| chart values(value) as $attribute$ values(value_overlay) as $attribute_overlay$ by "Shot #"</query>
+          <earliest>0</earliest>
+          <sampleRatio>1</sampleRatio>
+        </search>
+        <option name="charting.axisLabelsX.majorLabelStyle.overflowMode">ellipsisNone</option>
+        <option name="charting.axisLabelsX.majorLabelStyle.rotation">0</option>
+        <option name="charting.axisTitleX.visibility">visible</option>
+        <option name="charting.axisTitleY.visibility">visible</option>
+        <option name="charting.axisTitleY2.visibility">visible</option>
+        <option name="charting.axisX.scale">linear</option>
+        <option name="charting.axisY.scale">linear</option>
+        <option name="charting.axisY2.enabled">1</option>
+        <option name="charting.axisY2.scale">inherit</option>
+        <option name="charting.chart">column</option>
+        <option name="charting.chart.bubbleMaximumSize">50</option>
+        <option name="charting.chart.bubbleMinimumSize">10</option>
+        <option name="charting.chart.bubbleSizeBy">area</option>
+        <option name="charting.chart.nullValueMode">gaps</option>
+        <option name="charting.chart.overlayFields">$attribute_overlay$</option>
+        <option name="charting.chart.showDataLabels">none</option>
+        <option name="charting.chart.sliceCollapsingThreshold">0.01</option>
+        <option name="charting.chart.stackMode">default</option>
+        <option name="charting.chart.style">shiny</option>
+        <option name="charting.drilldown">all</option>
+        <option name="charting.layout.splitSeries">0</option>
+        <option name="charting.layout.splitSeries.allowIndependentYRanges">0</option>
+        <option name="charting.legend.labelStyle.overflowMode">ellipsisMiddle</option>
+        <option name="charting.legend.placement">right</option>
+      </chart>
+    </panel>
+  </row>
+</form>

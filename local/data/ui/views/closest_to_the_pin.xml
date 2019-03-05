@@ -1,0 +1,138 @@
+<form theme="light">
+  <label>Closest To The Pin</label>
+  <fieldset submitButton="true" autoRun="true">
+    <input type="text" token="name" searchWhenChanged="true">
+      <label>Name</label>
+      <prefix>"</prefix>
+      <suffix>"</suffix>
+    </input>
+    <input type="time" token="field1" searchWhenChanged="false">
+      <label></label>
+      <default>
+        <earliest>0</earliest>
+        <latest></latest>
+      </default>
+    </input>
+  </fieldset>
+  <row>
+    <panel>
+      <single>
+        <title>Current Player</title>
+        <search>
+          <query>|stats count | eval name=$name$,game_mode="closestToThePin" | table name,game_mode | collect index=golf</query>
+        </search>
+        <option name="colorBy">value</option>
+        <option name="colorMode">none</option>
+        <option name="numberPrecision">0</option>
+        <option name="showSparkline">1</option>
+        <option name="showTrendIndicator">1</option>
+        <option name="trendColorInterpretation">standard</option>
+        <option name="trendDisplayMode">absolute</option>
+        <option name="useColors">0</option>
+        <option name="useThousandSeparators">1</option>
+        <option name="drilldown">none</option>
+      </single>
+    </panel>
+    <panel>
+      <table>
+        <title>Recent Distances (Yards)</title>
+        <search>
+          <query>index=golf* | eval pinDistance=150,yDist=abs(total_distance_yds-pinDistance),xDist=abs(offline_yds),distanceToHole=sqrt(xDist*xDist+yDist*yDist) | search distanceToHole&gt;1  | chart max(distanceToHole) as "Distance To Hole"  by shot| sort -shot | head 5 | fields "Distance To Hole"</query>
+          <earliest>$field1.earliest$</earliest>
+          <latest>$field1.latest$</latest>
+        </search>
+        <option name="drilldown">cell</option>
+        <option name="refresh.display">progressbar</option>
+      </table>
+    </panel>
+    <panel>
+      <single>
+        <title>SMASH Factor</title>
+        <search>
+          <query>index=golf* club="1w" | eval SMASH=exact(ball_speed_mph/club_head_speed_mph) | stats latest(SMASH)</query>
+          <earliest>$field1.earliest$</earliest>
+          <latest>$field1.latest$</latest>
+        </search>
+        <option name="drilldown">none</option>
+        <option name="height">159</option>
+        <option name="numberPrecision">0.000</option>
+        <option name="rangeColors">["0xdc4e41","0xf1813f","0xf8be34","0x006d9c","0x53a051"]</option>
+        <option name="rangeValues">[1,1.2,1.3,1.4]</option>
+        <option name="refresh.display">progressbar</option>
+        <option name="useColors">1</option>
+      </single>
+    </panel>
+    <panel>
+      <single>
+        <title>Club Head Speed</title>
+        <search>
+          <query>index=golf* | stats latest("club_head_speed_mph")</query>
+          <earliest>$field1.earliest$</earliest>
+          <latest>$field1.latest$</latest>
+        </search>
+        <option name="afterLabel">MPH</option>
+        <option name="colorBy">value</option>
+        <option name="colorMode">none</option>
+        <option name="drilldown">none</option>
+        <option name="height">147</option>
+        <option name="linkView">search</option>
+        <option name="numberPrecision">0.00</option>
+        <option name="rangeColors">["0xd93f3c","0xf7bc38","0x6db7c6","0x65a637","0x6BFF36"]</option>
+        <option name="rangeValues">[50,75,100,120]</option>
+        <option name="showSparkline">1</option>
+        <option name="showTrendIndicator">1</option>
+        <option name="trendColorInterpretation">standard</option>
+        <option name="trendDisplayMode">absolute</option>
+        <option name="trendInterval">auto</option>
+        <option name="useColors">1</option>
+        <option name="useThousandSeparators">1</option>
+      </single>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <viz type="svg.svg">
+        <title>Green View</title>
+        <search>
+          <query>index=golf total_distance_yds &gt; 1| eval pinDistance=150,y=abs(total_distance_yds-pinDistance),x=abs(offline_yds),distanceToHole=sqrt(xDist*xDist+yDist*yDist),player="bob | table distanceToHole,offline_yds,total_distance_yds" | `svg_putting_ball(player,x,y,distance)` | eval a=1 | transaction a | eval balls=mvjoin(svg_ball,"") | `svg_putting_green_balls(balls)`</query>
+          <earliest>$field1.earliest$</earliest>
+          <latest>$field1.latest$</latest>
+          <sampleRatio>1</sampleRatio>
+        </search>
+        <option name="drilldown">none</option>
+        <option name="height">382</option>
+        <option name="refresh.display">progressbar</option>
+        <option name="trellis.enabled">0</option>
+        <option name="trellis.scales.shared">1</option>
+        <option name="trellis.size">medium</option>
+      </viz>
+    </panel>
+    <panel>
+      <single>
+        <title>Distance To The Pin</title>
+        <search>
+          <query>index=golf  |  eval pinDistance=150,yDist=abs(total_distance_yds-pinDistance),xDist=abs(offline_yds),distanceToHole=sqrt(xDist*xDist+yDist*yDist) | stats latest("distanceToHole")</query>
+          <earliest>$field1.earliest$</earliest>
+          <latest>$field1.latest$</latest>
+        </search>
+        <option name="afterLabel">Yards</option>
+        <option name="colorBy">value</option>
+        <option name="colorMode">block</option>
+        <option name="drilldown">none</option>
+        <option name="height">360</option>
+        <option name="linkView">search</option>
+        <option name="numberPrecision">0.00</option>
+        <option name="rangeColors">["0x53a051","0x006d9c","0xf8be34","0xf1813f","0xdc4e41"]</option>
+        <option name="rangeValues">[2,5,10,20]</option>
+        <option name="refresh.display">progressbar</option>
+        <option name="showSparkline">1</option>
+        <option name="showTrendIndicator">1</option>
+        <option name="trendColorInterpretation">standard</option>
+        <option name="trendDisplayMode">absolute</option>
+        <option name="trendInterval">auto</option>
+        <option name="useColors">1</option>
+        <option name="useThousandSeparators">0</option>
+      </single>
+    </panel>
+  </row>
+</form>

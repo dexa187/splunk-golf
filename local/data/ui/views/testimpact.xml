@@ -1,0 +1,24 @@
+<dashboard>
+  <label>TestImpact</label>
+  <row>
+    <panel>
+      <viz type="svg.svg">
+        <title>Impact</title>
+        <search>
+          <query>index=golf horiz_impact!="horiz impact (mm)" vert_impact!="vert impact (mm)" | head 1 | eval x=horiz_impact,y=vert_impact,player="test" | `ball(player,x,y)` | `impactA(svg_ball)`</query>
+          <earliest>0</earliest>
+          <latest></latest>
+        </search>
+        <option name="drilldown">none</option>
+        <option name="height">224</option>
+        <option name="refresh.display">progressbar</option>
+        <option name="svg.svg.debug">false</option>
+        <option name="svg.svg.error_message_delay_in_seconds">0</option>
+        <option name="svg.svg.viewbox_height">300</option>
+        <option name="svg.svg.viewbox_min_x">400</option>
+        <option name="svg.svg.viewbox_min_y">60</option>
+        <option name="svg.svg.viewbox_width">100</option>
+      </viz>
+    </panel>
+  </row>
+</dashboard>

@@ -1,0 +1,16 @@
+{
+  "name": "golf",
+  "version": "1.0.0",
+  "description": "This is where you put any scripts you want to add to this app.",
+  "main": "golf.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "ethereumjs-tx": "^1.3.7",
+    "readline": "^1.3.0",
+    "web3": "^1.0.0-beta.46"
+  }
+}
