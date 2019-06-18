@@ -31,7 +31,7 @@ require([
     "splunkjs/mvc/savedsearchmanager",
     "splunkjs/mvc/postprocessmanager",
     "splunkjs/mvc/simplexml/urltokenmodel",
-    "/static/app/buttercup-golf/node_modules/jsqr/dist/jsQR.js"
+    "/static/app/splunk-golf/node_modules/jsqr/dist/jsQR.js"
 ],
     function (
         mvc,
